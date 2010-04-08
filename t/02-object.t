@@ -1,9 +1,14 @@
 #!perl -T
 
-use Config;
+BEGIN {
+    use Config;
+    if (! $Config{'useithreads'}) {
+        print("1..0 # SKIP Perl not compiled with 'useithreads'\n");
+        exit(0);
+    }
+}
 
-my $have_threads = 0;
-eval { require threads; use threads; $have_threads = 1; } if( 'define' eq $Config{usethreads} );
+use threads;
 use threads::variables::reap;
 use Test::More;
 
@@ -13,7 +18,6 @@ INIT
     1;
 }
 
-plan( skip_all => "Test 02-object isn't reasonable without threads" ) unless $have_threads;
 plan( tests => 1 );
 
 sub runThreads(@)

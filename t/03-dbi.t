@@ -1,9 +1,14 @@
 #!perl
 
-use Config;
+BEGIN {
+    use Config;
+    if (! $Config{'useithreads'}) {
+        print("1..0 # SKIP Perl not compiled with 'useithreads'\n");
+        exit(0);
+    }
+}
 
-my $have_threads = 0;
-eval { require threads; $have_threads = 1; } if( 'define' eq $Config{usethreads} );
+use threads;
 my $have_threads_reap = 0;
 eval { require threads::variables::reap; $have_threads_reap = 1; };
 my $have_dbd_csv = 0;
@@ -22,7 +27,6 @@ INIT {
     1;
 }
 
-plan( skip_all => "Test 03-dbi isn't reasonable without threads" ) unless $have_threads;
 plan( skip_all => "Test 03-dbi isn't reasonable without threads::variable::reap" ) unless $have_threads_reap;
 plan( skip_all => "Test 03-dbi isn't reasonable without Log::Log4perl" ) unless $have_log4perl;
 
